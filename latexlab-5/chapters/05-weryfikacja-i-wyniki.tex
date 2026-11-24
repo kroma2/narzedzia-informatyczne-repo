@@ -1,0 +1,54 @@
+% TREŚĆ ROZDZIAŁU: zastąp wskazówki opisem testów i uzyskanych wyników.
+% Każdą tabelę i każdy rysunek omów w tekście. Podawaj jednostki, warunki
+% pomiaru oraz odwołanie do wymagania, które dany test weryfikuje.
+\chapter{Weryfikacja i wyniki}
+\label{chap:wyniki}
+
+\section{Metodyka testów}
+Opisz stanowisko, dane, warunki, procedurę i miary. Informacje powinny wystarczyć do powtórzenia najważniejszych testów.
+
+\section{Wyniki}
+Dane porównawcze obu algorytmów zawiera \cref{tab:porownanie-algorytmow}.
+Zależność czasu sortowania bąbelkowego od liczby elementów pokazuje \cref{fig:wykres-sortowania}.
+Kod funkcji wyszukującej maksimum zamieszczono w \cref{lst:max-element}.
+\subsection{Porównanie algorytmów}
+Zestawienie czasu i liczby porównań dla dwóch algorytmów zawiera
+\cref{tab:porownanie-algorytmow}. Są to dane dydaktyczne, a nie wyniki pomiarów.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Porównanie przykładowych wyników dwóch algorytmów sortowania}
+  \label{tab:porownanie-algorytmow}
+  \begin{tabularx}{\textwidth}{@{}c *{4}{>{\centering\arraybackslash}X}@{}}
+    \toprule
+    Liczba elementów $n$
+      & Bubble Sort czas [ms]
+      & Insertion Sort czas [ms]
+      & Bubble Sort porównania
+      & Insertion Sort porównania \\
+    \midrule
+    100  & \num{0.4}   & \num{0.2}   & \num{4950}     & \num{2600}    \\
+    500  & \num{8.9}   & \num{4.1}   & \num{124750}   & \num{65000}   \\
+    1000 & \num{35.2}  & \num{16.3}  & \num{499500}   & \num{260000}  \\
+    2000 & \num{141.5} & \num{65.1}  & \num{1999000}  & \num{1040000} \\
+    5000 & \num{883.7} & \num{406.4} & \num{12497500} & \num{6500000} \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+Zależność czasu sortowania bąbelkowego od liczby elementów pokazuje
+\cref{fig:wykres-sortowania}. Wykres dotyczy wyłącznie Bubble Sort.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.8\textwidth]{%
+    chapters/05-weryfikacja-i-wyniki/figures/wykres_sortowania.png}
+  \caption{Przykładowa zależność czasu sortowania od liczby elementów}
+  \label{fig:wykres-sortowania}
+\end{figure}
+
+\section{Ocena spełnienia wymagań}
+Dla każdego wymagania podaj wynik testu oraz status: spełnione, częściowo spełnione albo niespełnione. Odnieś się do kryteriów z \cref{chap:cel-wymagania}.
+
+\section{Dyskusja}
+Zinterpretuj rezultaty, wyjaśnij odstępstwa i wskaż ograniczenia wiarygodności oceny.

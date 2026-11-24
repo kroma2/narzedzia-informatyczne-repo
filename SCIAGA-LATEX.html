@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sciaga LaTeX — laboratoria 2–7</title>
+<style>
+  :root { color-scheme: light; }
+  body { font: 16px/1.45 "Segoe UI", Calibri, sans-serif; max-width: 920px; margin: 0 auto; padding: 24px 28px 80px; color: #1a1a1a; background: #fff; }
+  h1 { font-size: 1.7rem; border-bottom: 3px solid #00467d; padding-bottom: 8px; }
+  h2 { font-size: 1.25rem; margin-top: 1.8em; color: #00467d; border-bottom: 1px solid #d0d7de; padding-bottom: 4px; }
+  h3 { font-size: 1.05rem; margin-top: 1.3em; }
+  code { font-family: Consolas, "Cascadia Mono", monospace; font-size: 0.92em; background: #f3f5f7; padding: 0.1em 0.35em; border-radius: 3px; }
+  pre { background: #f6f8fa; border: 1px solid #d0d7de; border-radius: 6px; padding: 12px 14px; overflow-x: auto; }
+  pre code { background: none; padding: 0; font-size: 0.88em; }
+  table { border-collapse: collapse; width: 100%; margin: 0.8em 0 1.2em; font-size: 0.95em; }
+  th, td { border: 1px solid #c8cdd2; padding: 6px 8px; vertical-align: top; text-align: left; }
+  th { background: #eef3f8; }
+  a { color: #00467d; }
+  blockquote { margin: 0.6em 0; padding: 0.2em 0.9em; border-left: 4px solid #00467d; background: #f4f8fb; }
+</style>
+</head>
+<body>
+<h1 id="sciaga-latex-laboratoria-27">Ściąga LaTeX — laboratoria 2–7</h1>
+<p>Zaliczenie: <strong>TeXstudio + MiKTeX</strong>, lokalnie. Silnik zawsze <strong>LuaLaTeX</strong>. Treść piszesz w <code>chapters/</code>, danych nie ruszasz w <code>config/project-style.sty</code>.</p>
+<p>Szukaj w tym pliku przez Ctrl+F. Hasła na górze listy: <code>LuaLaTeX</code>, <code>biber</code>, <code>??</code>, <code>equation</code>, <code>tabular</code>, <code>lstinputlisting</code>, <code>tikzpicture</code>, <code>addplot</code>, <code>literatura.bib</code>, <code>\cref</code>, <code>\qty</code>.</p>
+<p>Mapa folderów (nagłówki PDF 6 i 7 mają zły numer laboratorium; liczy się treść):</p>
+<table>
+<thead>
+<tr>
+<th>Folder</th>
+<th>Temat</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>latexlab-2</td>
+<td>szablon, metadane, kompilacja</td>
+</tr>
+<tr>
+<td>latexlab-3</td>
+<td>sekcje, listy, pogrubienie, matematyka</td>
+</tr>
+<tr>
+<td>latexlab-4</td>
+<td>tabele, rysunki, listingi Pythona</td>
+</tr>
+<tr>
+<td>latexlab-5</td>
+<td>listing C, odwołania, bibliografia, spisy</td>
+</tr>
+<tr>
+<td>latexlab-6</td>
+<td>schematy TikZ</td>
+</tr>
+<tr>
+<td>latexlab-7</td>
+<td>wykresy PGFPlots + CSV</td>
+</tr>
+</tbody>
+</table>
+<p>Pakiety <strong>już załadowane</strong> przez <code>config/project-style.sty</code>: <code>amsmath</code>, <code>booktabs</code>, <code>tabularx</code>, <code>siunitx</code>, <code>graphicx</code>, <code>listings</code>, <code>tikz</code> (+ <code>positioning</code>, <code>arrows.meta</code>, <code>shapes.geometric</code>), <code>hyperref</code>, <code>cleveref</code>, <code>biblatex</code> (Biber, styl numeryczny, sortowanie alfabetyczne), <code>csquotes</code>, <code>babel</code> (polish).</p>
+<p>Dopisujesz sam w <code>main.tex</code>, <strong>po</strong> <code>\usepackage{config/project-style}</code>:</p>
+<pre><code class="language-latex">\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+
+\usepackage{multirow}   % tylko gdy scalasz wiersze nagłówka
+</code></pre>
+<p>TikZ-a drugi raz nie dodawaj, jeśli styl już go wczytał. <code>pgfplots</code> w stylu <strong>nie ma</strong>.</p>
+<hr />
+<h2 id="0-start-w-60-sekund">0. Start w 60 sekund</h2>
+<ol>
+<li>Otwórz <code>main.tex</code>. Pierwsza linia: <code>% !TeX program = lualatex</code>.</li>
+<li>TeXstudio: <strong>Opcje → Konfiguruj TeXstudio → Zbuduj → Pokaż opcje zaawansowane → Kompilator domyślny = <code>txs:///lualatex</code></strong>.</li>
+<li>Tytuł, autor, przedmiot: tylko <code>config/metadata.tex</code>. Zostaw <code>\projectstatus</code> jako <code>draft</code>.</li>
+<li>Tekst: pliki w <code>chapters/</code>. Nowy rozdział = nowy plik zaczynający się od <code>\chapter{...}</code> i dopisany <code>\include{...}</code> <strong>bez</strong> <code>.tex</code>.</li>
+<li>Kompilacja zwykła: LuaLaTeX. Po cytowaniach albo nowych odwołaniach:</li>
+</ol>
+<pre><code class="language-text">lualatex main.tex
+biber main
+lualatex main.tex
+lualatex main.tex
+</code></pre>
+<p>W TeXstudio to kolejno: <strong>LuaLaTeX → Biber → LuaLaTeX → LuaLaTeX</strong>.</p>
+<p><code>latexmk</code> jest opcjonalny i na Windowsie chce Perla. PDF z samego LuaLaTeX to <code>main.pdf</code> w katalogu projektu. PDF z <code>latexmk</code> to <code>build/main.pdf</code>.</p>
+<hr />
+<h2 id="1-gdzie-co-lezy-lab-2">1. Gdzie co leży (lab 2)</h2>
+<pre><code class="language-text">main.tex                  kolejność rozdziałów, NIC innego
+config/metadata.tex       tytuł, autorzy, true/false spisów
+config/project-style.sty  nie edytuj na zaliczeniu
+chapters/*.tex            treść
+literatura.bib            źródła
+backmatter/               oświadczenie AI i wkład autorów
+</code></pre>
+<p>W <code>main.tex</code> wolno zmieniać tylko listę <code>\include</code> w sekcji rozdziałów. Reszty między <code>\begin{document}</code> a rozdziałami nie ruszaj.</p>
+<p>Wyłączenie rozdziału: <code>%</code> przed <code>\include</code>. Dodanie:</p>
+<pre><code class="language-latex">\include{chapters/08-instrukcja-uzytkownika}
+</code></pre>
+<p>Plik <code>chapters/08-instrukcja-uzytkownika.tex</code> zaczyna się od:</p>
+<pre><code class="language-latex">\chapter{Instrukcja użytkownika}
+</code></pre>
+<p>Szybsza kompilacja (Overleaf; lokalnie też działa), w preambule <code>main.tex</code>:</p>
+<pre><code class="language-latex">\includeonly{chapters/01-wprowadzenie,chapters/04-realizacja}
+</code></pre>
+<p>Przed oddaniem zakomentuj <code>\includeonly</code> i skompiluj całość.</p>
+<h3 id="metadane-zmieniaj-tylko-tekst-w">Metadane — zmieniaj tylko tekst w <code>{ }</code></h3>
+<pre><code class="language-latex">\newcommand{\projectstatus}{draft}          % final wywala błąd, gdy brakuje danych
+\newcommand{\projecttitle}{Tytuł}
+\newcommand{\projectsubtitle}{}             % puste = brak podtytułu
+\newcommand{\coursetitle}{Narzędzia informatyczne w praktyce inżynierskiej}
+\newcommand{\projecttype}{Sprawozdanie z ćwiczenia laboratoryjnego}
+\newcommand{\programme}{Informatyka}
+\newcommand{\instructor}{dr inż. Marcin Kowol}
+\newcommand{\projectauthors}{%
+  Imię Nazwisko &amp; 000000 \\
+}
+\newcommand{\projectpdfauthors}{Imię Nazwisko}   % bez &amp; i bez \\
+\newcommand{\submissiondate}{24.11.2026}
+</code></pre>
+<p>Kilku autorów:</p>
+<pre><code class="language-latex">\newcommand{\projectauthors}{%
+  Anna Nowak &amp; 123456 \\
+  Jan Kowalski &amp; 234567 \\
+}
+\newcommand{\projectpdfauthors}{Anna Nowak, Jan Kowalski}
+</code></pre>
+<p>Spisy — wartości to <code>true</code> albo <code>false</code>, bez cudzysłowów:</p>
+<pre><code class="language-latex">\newcommand{\showlistoffigures}{true}
+\newcommand{\showlistoftables}{true}
+\newcommand{\showlistoflistings}{true}
+</code></pre>
+<p>W <code>main.tex</code> spisy są już podpięte. Drugi raz <code>\listoffigures</code> nie dodawaj, jeśli te przełączniki są włączone. Samodzielnie (gdyby szablon ich nie miał):</p>
+<pre><code class="language-latex">\listoffigures
+\listoftables
+\lstlistoflistings
+</code></pre>
+<p>Znaki specjalne w tekście metadanych i w akapitach: <code>\%</code> <code>\&amp;</code> <code>\_</code> <code>\#</code> <code>\$</code> <code>\{</code> <code>\}</code>. Przykład: <code>50\%</code>, <code>plik\_wynikowy</code>.</p>
+<h3 id="struktura-dokumentu">Struktura dokumentu</h3>
+<pre><code class="language-latex">\chapter{Tytuł rozdziału}       % 1
+\section{Tytuł sekcji}          % 1.1
+\subsection{Tytuł podsekcji}    % 1.1.1
+\subsubsection{Jeszcze niżej}  % 1.1.1.1
+</code></pre>
+<p>Akapit = pusta linia. <code>\\</code> to łamanie wiersza (tabele, węzły TikZ), nie nowy akapit.</p>
+<p>Załączniki, na końcu <code>main.tex</code> (już jest <code>\appendix</code>):</p>
+<pre><code class="language-latex">\appendix
+\include{chapters/08-zalacznik-a}
+</code></pre>
+<p>Od <code>\appendix</code> kolejne <code>\chapter</code> dostają litery A, B, C.</p>
+<hr />
+<h2 id="2-tekst-listy-matematyka-lab-3">2. Tekst, listy, matematyka (lab 3)</h2>
+<h3 id="formatowanie">Formatowanie</h3>
+<pre><code class="language-latex">\textbf{pogrubienie}
+\textit{kursywa}
+\emph{wyróżnienie}      % zwykle kursywa; wewnątrz kursywy wraca do prostej
+\texttt{kod w tekście}
+\underline{podkreślenie}
+</code></pre>
+<p>W PDF ma być prawdziwa sekcja (<code>\section</code>), nie sam pogrubiony nagłówek.</p>
+<h3 id="listy">Listy</h3>
+<pre><code class="language-latex">\begin{enumerate}
+  \item Pierwszy krok.
+  \item Drugi krok.
+\end{enumerate}
+
+\begin{itemize}
+  \item prostota implementacji,
+  \item niska efektywność dla dużych zbiorów.
+\end{itemize}
+
+\begin{description}
+  \item[Bubble Sort] porównuje sąsiadów.
+  \item[Insertion Sort] wstawia element w posortowaną część.
+\end{description}
+</code></pre>
+<p>Numeracja a, b, c (pakiet <code>enumitem</code> jest w szablonie):</p>
+<pre><code class="language-latex">\begin{enumerate}[label=\alph*)]
+  \item pierwszy
+  \item drugi
+\end{enumerate}
+</code></pre>
+<h3 id="matematyka-sciaga-znakow">Matematyka — ściąga znaków</h3>
+<p>W tekście: <code>\( ... \)</code> albo <code>$...$</code>. Osobny wiersz <strong>bez</strong> numeru: <code>\[ ... \]</code>. Osobny wiersz <strong>z</strong> numerem: środowisko <code>equation</code>.</p>
+<pre><code class="language-latex">\( a_i &gt; a_{i+1} \)
+\( O(n^2) \)
+\( O(1) \)
+
+\begin{equation}
+  C(n) = \frac{n(n-1)}{2}
+  \label{eq:porownania}
+\end{equation}
+
+\[
+  S = \sum_{i=1}^{n} a_i
+\]
+
+\[
+  f(x) = x^3 + 2x^2 - 5x, \qquad f'(x) = 3x^2 + 4x - 5
+\]
+
+\[
+  \int_{0}^{1} x^2 \, dx = \frac{1}{3}
+\]
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Chcesz</th>
+<th>Piszesz</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>indeks</td>
+<td><code>a_i</code> <code>a_{i+1}</code></td>
+</tr>
+<tr>
+<td>potęga</td>
+<td><code>n^2</code> <code>x^{10}</code></td>
+</tr>
+<tr>
+<td>ułamek</td>
+<td><code>\frac{a}{b}</code></td>
+</tr>
+<tr>
+<td>suma</td>
+<td><code>\sum_{i=1}^{n} a_i</code></td>
+</tr>
+<tr>
+<td>całka</td>
+<td><code>\int_{0}^{1} x^2 \, dx</code></td>
+</tr>
+<tr>
+<td>pierwiastek</td>
+<td><code>\sqrt{x}</code> <code>\sqrt[3]{x}</code></td>
+</tr>
+<tr>
+<td>pochodna</td>
+<td><code>f'(x)</code></td>
+</tr>
+<tr>
+<td>tekst w wzorze</td>
+<td><code>\text{dla } n &gt; 1</code></td>
+</tr>
+<tr>
+<td>odstęp</td>
+<td><code>\quad</code> <code>\qquad</code> <code>\,</code></td>
+</tr>
+<tr>
+<td>nierówności</td>
+<td><code>\leq</code> <code>\geq</code> <code>\neq</code> <code>\approx</code></td>
+</tr>
+<tr>
+<td>należenie</td>
+<td><code>\in</code> <code>\notin</code></td>
+</tr>
+<tr>
+<td>mnożenie</td>
+<td><code>\cdot</code> <code>\times</code></td>
+</tr>
+<tr>
+<td>nieskończoność</td>
+<td><code>\infty</code> <code>\lim_{n \to \infty}</code></td>
+</tr>
+<tr>
+<td>greckie</td>
+<td><code>\alpha</code> <code>\beta</code> <code>\Delta</code> <code>\pi</code></td>
+</tr>
+<tr>
+<td>nawiasy na wysokość</td>
+<td><code>\left( ... \right)</code></td>
+</tr>
+<tr>
+<td>wielokropek</td>
+<td><code>\ldots</code> <code>\cdots</code></td>
+</tr>
+</tbody>
+</table>
+<p>Wiele równań z wyrównaniem (numer przy każdym wierszu):</p>
+<pre><code class="language-latex">\begin{align}
+  f(x) &amp;= x^2 - 2x - 3 \\
+  f'(x) &amp;= 2x - 2
+\end{align}
+</code></pre>
+<p>Bez numerów: <code>align*</code> albo <code>equation*</code>.</p>
+<p>Odwołanie do numeru równania: <code>\cref{eq:porownania}</code> → „równanie 1.1”. Na początku zdania: <code>\Cref{eq:porownania}</code>.</p>
+<p>Jednostki (siunitx, polski przecinek):</p>
+<pre><code class="language-latex">\qty{12}{\volt}
+\qty{883.7}{\milli\second}
+\qty{100}{\percent}
+\num{12497500}     % w PDF: 12 497 500
+\num{0.4}          % w PDF: 0,4
+</code></pre>
+<p>W pliku CSV do wykresu zostaw <strong>kropkę</strong> (<code>0.4</code>). <code>\num</code> i <code>\qty</code> same zrobią przecinek.</p>
+<hr />
+<h2 id="3-tabele-lab-4">3. Tabele (lab 4)</h2>
+<p>Podpis tabeli <strong>nad</strong> tabelą. <code>\label</code> <strong>zaraz po</strong> <code>\caption</code>. W tekście numer bierzesz z <code>\cref</code>, nigdy nie wpisujesz „Tabela 2” ręcznie.</p>
+<p>Pięć kolumn, które mieszczą się w szerokości tekstu (<code>tabularx</code> + <code>booktabs</code> są w szablonie):</p>
+<pre><code class="language-latex">Zestawienie zawiera \cref{tab:porownanie}.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Porównanie przykładowych wyników dwóch algorytmów sortowania}
+  \label{tab:porownanie}
+  \begin{tabularx}{\textwidth}{@{}c *{4}{&gt;{\centering\arraybackslash}X}@{}}
+    \toprule
+    Liczba elementów $n$
+      &amp; Bubble Sort czas [ms]
+      &amp; Insertion Sort czas [ms]
+      &amp; Bubble Sort porównania
+      &amp; Insertion Sort porównania \\
+    \midrule
+    100  &amp; \num{0.4}   &amp; \num{0.2}  &amp; \num{4950}    &amp; \num{2600} \\
+    500  &amp; \num{8.9}   &amp; \num{4.1}  &amp; \num{124750}  &amp; \num{65000} \\
+    1000 &amp; \num{35.2}  &amp; \num{16.3} &amp; \num{499500}  &amp; \num{260000} \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+</code></pre>
+<p>Prosta tabela, gdy kolumn jest mało:</p>
+<pre><code class="language-latex">\begin{tabular}{lcc}
+  \toprule
+  Nazwa &amp; Czas [ms] &amp; Porównania \\
+  \midrule
+  Bubble Sort &amp; 35,2 &amp; 499500 \\
+  Insertion Sort &amp; 16,3 &amp; 260000 \\
+  \bottomrule
+\end{tabular}
+</code></pre>
+<p>Specyfikacja kolumn: <code>l</code> lewo, <code>c</code> środek, <code>r</code> prawo, <code>p{3cm}</code> akapit o stałej szerokości, <code>X</code> rozciągana (tylko w <code>tabularx</code>). <code>|</code> rysuje pionową kreskę; w tym szablonie używa się <code>booktabs</code> bez pionowych kresek. <code>@{ }</code> ścina boczny margines komórki.</p>
+<p>Linie: <code>\toprule</code> góra, <code>\midrule</code> środek, <code>\bottomrule</code> dół. <code>\hline</code> zostaw.</p>
+<h3 id="nagowek-dwupoziomowy">Nagłówek dwupoziomowy</h3>
+<p><code>\multicolumn</code> działa od razu. <code>\multirow</code> wymaga <code>\usepackage{multirow}</code> w <code>main.tex</code>.</p>
+<pre><code class="language-latex">\begin{tabular}{ccccc}
+  \toprule
+  \multirow{2}{*}{Liczba elementów}
+    &amp; \multicolumn{2}{c}{Czas wykonania [ms]}
+    &amp; \multicolumn{2}{c}{Liczba porównań} \\
+  \cline{2-3} \cline{4-5}
+    &amp; Bubble &amp; Insertion &amp; Bubble &amp; Insertion \\
+  \midrule
+  100 &amp; 0,4 &amp; 0,2 &amp; 4950 &amp; 2600 \\
+  \bottomrule
+\end{tabular}
+</code></pre>
+<p><code>\multicolumn{2}{c}{tekst}</code> — 2 kolumny, wyśrodkowane. <code>\cline{2-3}</code> — kreska tylko pod kolumnami 2–3. <code>\multirow{2}{*}{tekst}</code> — komórka na 2 wiersze.</p>
+<p>Tabela na wiele stron: środowisko <code>longtable</code> (pakiet jest). Podpis: <code>\caption{...}\\</code> na początku.</p>
+<p>Gdy tabela jest za szeroka:</p>
+<pre><code class="language-latex">\begin{projectwidetable}
+  \begin{tabular}{...}
+    ...
+  \end{tabular}
+\end{projectwidetable}
+</code></pre>
+<hr />
+<h2 id="4-rysunki-lab-4">4. Rysunki (lab 4)</h2>
+<p>Ścieżka jest liczona <strong>od katalogu <code>main.tex</code></strong>, nie od pliku rozdziału.</p>
+<p>Wariant szablonowy (sam dobiera szerokość do marginesów):</p>
+<pre><code class="language-latex">\projectgraphic[width=0.8\textwidth]{chapters/05-weryfikacja-i-wyniki/figures/wykres.png}
+</code></pre>
+<p>Wariant ze środowiskiem, podpisem i odwołaniem — tego chcą na zaliczeniu:</p>
+<pre><code class="language-latex">Zależność pokazuje \cref{fig:wykres-sortowania}.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.8\textwidth]{%
+    chapters/05-weryfikacja-i-wyniki/figures/wykres_sortowania.png}
+  \caption{Przykładowa zależność czasu sortowania od liczby elementów}
+  \label{fig:wykres-sortowania}
+\end{figure}
+</code></pre>
+<p>Kolejność w rysunku: grafika, potem <code>\caption</code>, potem <code>\label</code>. Szerokość sensowna: <code>0.7\textwidth</code>–<code>0.85\textwidth</code>. <code>[htbp]</code> = tu, góra strony, dół strony, osobna strona.</p>
+<p>Dwa obrazki obok siebie (<code>subcaption</code> jest w szablonie):</p>
+<pre><code class="language-latex">\begin{figure}[htbp]
+  \centering
+  \begin{subfigure}{0.48\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/a.png}
+    \caption{Wariant A}
+    \label{fig:a}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}{0.48\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/b.png}
+    \caption{Wariant B}
+    \label{fig:b}
+  \end{subfigure}
+  \caption{Porównanie wariantów}
+  \label{fig:oba}
+\end{figure}
+</code></pre>
+<hr />
+<h2 id="5-kod-zrodowy-lab-4-i-5">5. Kod źródłowy (lab 4 i 5)</h2>
+<p>Style gotowe w szablonie: <code>project-python</code>, <code>project-c</code>, <code>project-cpp</code>, <code>project-matlab</code>, <code>project-shell</code>. Mają już numerację wierszy (<code>numbers=left</code>), ramkę i podpis u góry. Polskich liter w listingu <strong>nie</strong> mapuj przez <code>literate</code>.</p>
+<h3 id="kod-wklejony-do-tex">Kod wklejony do <code>.tex</code></h3>
+<pre><code class="language-latex">Fragment pętli jest w \cref{lst:porownanie}.
+
+\begin{lstlisting}[
+  style=project-python,
+  caption={Porównanie dwóch sąsiednich elementów},
+  label={lst:porownanie}
+]
+if result[j] &gt; result[j + 1]:
+    result[j], result[j + 1] = result[j + 1], result[j]
+\end{lstlisting}
+</code></pre>
+<h3 id="kod-z-pliku-tego-pilnuja">Kod z pliku (tego pilnują)</h3>
+<p>Python:</p>
+<pre><code class="language-latex">\lstinputlisting[
+  style=project-python,
+  caption={Sortowanie bąbelkowe},
+  label={lst:bubble-sort}
+]{chapters/04-realizacja/code/bubble_sort.py}
+</code></pre>
+<p>C (lab 5), język i numery wierszy:</p>
+<pre><code class="language-latex">Funkcję przedstawia \cref{lst:max-element}.
+
+\lstinputlisting[
+  style=project-c,
+  language=C,
+  numbers=left,
+  caption={Wyszukiwanie największego elementu tablicy},
+  label={lst:max-element}
+]{chapters/04-realizacja/code/max_element.c}
+</code></pre>
+<p>Tylko wybrane linie (np. sama funkcja, bez <code>main</code>):</p>
+<pre><code class="language-latex">\lstinputlisting[
+  style=project-c,
+  firstline=1,
+  lastline=12,
+  caption={Sama funkcja max\_element},
+  label={lst:max-fragment}
+]{chapters/04-realizacja/code/max_element.c}
+</code></pre>
+<p>W podpisie listingu podkreślnik to <code>\_</code>. W kodzie wewnątrz <code>lstlisting</code> piszesz <code>_</code> normalnie.</p>
+<p>Zmiana pliku <code>.py</code> / <code>.c</code> wchodzi do PDF po zapisaniu pliku i ponownej kompilacji. Kodu w <code>.tex</code> wtedy nie przepisujesz.</p>
+<p>Inne opcje, gdyby kazali:</p>
+<pre><code class="language-latex">numbers=none          % wyłącz numery
+basicstyle=\ttfamily\footnotesize
+breaklines=true       % już jest w stylu project
+frame=single
+</code></pre>
+<p>Język bez stylu projektu: <code>\begin{lstlisting}[language=Python]</code>.</p>
+<p><code>max_element</code> w tekście: <code>\texttt{max\_element}</code>.</p>
+<hr />
+<h2 id="6-odwoania-lab-4-i-5">6. Odwołania (lab 4 i 5)</h2>
+<table>
+<thead>
+<tr>
+<th>Obiekt</th>
+<th>Etykieta</th>
+<th>Po czym</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>tabela</td>
+<td><code>\label{tab:...}</code></td>
+<td>po <code>\caption</code></td>
+</tr>
+<tr>
+<td>rysunek</td>
+<td><code>\label{fig:...}</code></td>
+<td>po <code>\caption</code></td>
+</tr>
+<tr>
+<td>listing</td>
+<td><code>label={lst:...}</code></td>
+<td>w opcjach listingu</td>
+</tr>
+<tr>
+<td>równanie</td>
+<td><code>\label{eq:...}</code></td>
+<td>wewnątrz <code>equation</code></td>
+</tr>
+<tr>
+<td>rozdział</td>
+<td><code>\label{chap:...}</code></td>
+<td>po <code>\chapter</code></td>
+</tr>
+<tr>
+<td>sekcja</td>
+<td><code>\label{sec:...}</code></td>
+<td>po <code>\section</code></td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-latex">\cref{tab:porownanie}     % tabela 3.1   (w środku zdania)
+\Cref{fig:wykres}         % Rysunek 3.2  (początek zdania)
+\ref{tab:porownanie}      % sam numer 3.1
+\pageref{fig:wykres}      % numer strony
+\cref{tab:a,tab:b}        % tabela 1.1 i 1.2
+</code></pre>
+<p>Szablon tłumaczy nazwy: tabela, rysunek, listing, równanie, rozdział. Dlatego na zaliczeniu pisz <code>\cref</code>, nie „Rys. 1”.</p>
+<p><code>??</code> w PDF: etykieta jest przed <code>\caption</code>, literówka w kluczu, albo brakuje drugiej kompilacji LuaLaTeX.</p>
+<p>Każdy klucz w całym projekcie jest unikalny.</p>
+<hr />
+<h2 id="7-bibliografia-lab-5">7. Bibliografia (lab 5)</h2>
+<p>Źródła tylko w <code>literatura.bib</code>. W tekście <code>\cite{klucz}</code>. Numerów <code>[1]</code> nie wpisujesz. Wykaz robi <code>\printprojectbibliography</code> (już jest w <code>main.tex</code>).</p>
+<p>Kolejność w PDF: <strong>alfabetycznie po nazwisku pierwszego autora</strong>, potem rok, potem tytuł. To nie jest kolejność cytowań w tekście.</p>
+<p>Autorów rozdziela angielskie <code>and</code>, także po polsku: <code>Jan Kowalski and Anna Nowak</code>. Organizacja jako autor: podwójne nawiasy <code>{{GNU Project}}</code>.</p>
+<p>Po każdej zmianie <code>.bib</code>: LuaLaTeX, Biber, LuaLaTeX, LuaLaTeX. Zostawiony klucz <code>[gcc2026]</code> albo brak rozdziału „Literatura” = Biber nie poszedł.</p>
+<h3 id="strona-dokumentacja-online-obowiazkowe-na-lab-5">Strona / dokumentacja (<code>@online</code>) — obowiązkowe na lab 5</h3>
+<pre><code class="language-latex">@online{gcc2026,
+  author  = {{GNU Project}},
+  title   = {GCC online documentation},
+  year    = {2026},
+  url     = {https://gcc.gnu.org/onlinedocs/},
+  urldate = {2026-11-24}
+}
+
+@online{latexdocs2026,
+  author  = {{LaTeX Project}},
+  title   = {LaTeX documentation},
+  year    = {2026},
+  url     = {https://www.latex-project.org/help/documentation/},
+  urldate = {2026-11-24}
+}
+</code></pre>
+<p><code>urldate</code> to data dostępu, format <code>RRRR-MM-DD</code>. Źródła mają być prawdziwe. Cytujesz publikację, nie Google Scholar. BibTeX ze Scholara sprawdzasz w oryginale.</p>
+<h3 id="ksiazka-artyku-manual">Książka, artykuł, manual</h3>
+<pre><code class="language-latex">@book{lamport1994,
+  author    = {Leslie Lamport},
+  title     = {LaTeX: A Document Preparation System},
+  edition   = {2},
+  year      = {1994},
+  publisher = {Addison-Wesley}
+}
+
+@article{knuth1998,
+  author  = {Donald E. Knuth},
+  title   = {Tytuł artykułu},
+  journal = {Nazwa czasopisma},
+  year    = {1998},
+  volume  = {10},
+  number  = {2},
+  pages   = {1--12},
+  doi     = {10.0000/przyklad}
+}
+
+@manual{listings2024,
+  title   = {The Listings Package},
+  year    = {2024},
+  url     = {https://ctan.org/pkg/listings},
+  urldate = {2026-11-24}
+}
+</code></pre>
+<p>W tekście:</p>
+<pre><code class="language-latex">Składnię opisuje dokumentacja GCC \cite{gcc2026}.
+Porównaj \cite{lamport1994,knuth1998}.
+Szczegóły podaje \cite[s.~12]{lamport1994}.
+</code></pre>
+<p>Przecinek po każdym polu w <code>.bib</code>. Klucz (to przed przecinkiem w <code>@online{gcc2026,</code>) bez spacji i bez polskich znaków. Procent <code>%</code> w <code>.bib</code> komentuje resztę wiersza.</p>
+<hr />
+<h2 id="8-tikz-schemat-blokowy-lab-6">8. TikZ — schemat blokowy (lab 6)</h2>
+<p>Wykres i schemat rysujesz kodem, nie wklejasz PNG. Biblioteki <code>positioning</code>, <code>shapes.geometric</code>, <code>arrows.meta</code> są już w stylu.</p>
+<p>Kształty z zajęć: <code>ellipse</code> (start/koniec), <code>rectangle</code> (operacja), <code>diamond</code> (warunek). Położenie: <code>below=of nazwa</code>. Strzałka: <code>-{Stealth}</code>. Powrót pętli: <code>-- ++(1.5,0) |-</code>.</p>
+<p>Gotowiec sortowania bąbelkowego (wstaw w <code>figure</code>):</p>
+<pre><code class="language-latex">Schemat działania pokazuje \cref{fig:babelkowe}.
+
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}[
+      node distance=9mm,
+      startstop/.style={ellipse, draw, align=center, minimum width=2.6cm},
+      process/.style={rectangle, draw, align=center, minimum width=3.6cm},
+      decision/.style={diamond, draw, align=center, aspect=2.4, inner sep=1pt},
+      every path/.style={-{Stealth}}
+    ]
+    \node[startstop] (start) {Start};
+    \node[process, below=of start] (pobierz) {Pobierz tablicę};
+    \node[process, below=of pobierz] (przebieg)
+      {Wykonaj pełny przebieg\\porównań i zamian};
+    \node[decision, below=14mm of przebieg] (warunek)
+      {Czy wykonano\\zamianę?};
+    \node[startstop, below=14mm of warunek] (koniec) {Koniec};
+
+    \draw (start) -- (pobierz);
+    \draw (pobierz) -- (przebieg);
+    \draw (przebieg) -- (warunek);
+    \draw (warunek) -- node[right] {Nie} (koniec);
+    \draw (warunek.east) -- ++(1.6,0) |- (przebieg.east)
+      node[pos=0.25, right] {Tak};
+  \end{tikzpicture}
+  \caption{Schemat blokowy sortowania bąbelkowego}
+  \label{fig:babelkowe}
+\end{figure}
+</code></pre>
+<p>Ściąga pozycji (biblioteka <code>positioning</code>):</p>
+<pre><code class="language-latex">below=of start
+above=of start
+right=of start
+left=of start
+below=12mm of start
+</code></pre>
+<p>Kotwice węzła: <code>.north</code> <code>.south</code> <code>.east</code> <code>.west</code>.</p>
+<p>Podpis gałęzi na strzałce: <code>-- node[right] {Nie}</code>. Łamanie tekstu w węźle: <code>\\</code> oraz <code>align=center</code>.</p>
+<p>Wariant z warunkiem <code>n &lt; 2</code> (zadanie dodatkowe):</p>
+<pre><code class="language-latex">\node[decision, below=12mm of pobierz] (maly) {$n &lt; 2$?};
+\node[process, below=14mm of maly] (przebieg) {Pełny przebieg};
+\draw (pobierz) -- (maly);
+\draw (maly) -- node[right] {Nie} (przebieg);
+\draw (maly.east) -- ++(1.8,0) node[above, pos=0.7] {Tak} |- (koniec.east);
+</code></pre>
+<p>Style globalne (jedna zmiana koloru aktualizuje wszystkie węzły tego typu). W preambule albo przed rysunkiem:</p>
+<pre><code class="language-latex">\tikzset{
+  proces/.style={rectangle, draw, fill=blue!8, align=center, minimum width=3.4cm},
+  decyzja/.style={diamond, draw, fill=orange!15, align=center, aspect=2.2, inner sep=1pt},
+  terminator/.style={ellipse, draw, fill=green!12, align=center, minimum width=2.6cm}
+}
+</code></pre>
+<p>Potem <code>\node[proces] ...</code>. Kolor: <code>fill=blue!10</code>, <code>draw=projectblue</code>. <code>projectblue</code> jest zdefiniowany w stylu szablonu.</p>
+<p>Gdy schemat wychodzi za margines: zmniejsz <code>minimum width</code>, <code>node distance</code> i <code>aspect</code>, albo owiń w <code>\resizebox{0.95\textwidth}{!}{ ... }</code>.</p>
+<p>Minimalny szkielet, gdy każą „od zera”:</p>
+<pre><code class="language-latex">\begin{tikzpicture}
+  \node[ellipse, draw] (start) {Start};
+  \node[rectangle, draw, below=of start] (krok) {Pobierz tablicę};
+  \draw[-{Stealth}] (start) -- (krok);
+\end{tikzpicture}
+</code></pre>
+<p>Bez <code>below=of</code> (gdyby biblioteki <code>positioning</code> nie było):</p>
+<pre><code class="language-latex">\node[rectangle, draw] at (0,-1.5) (krok) {Pobierz tablicę};
+\draw[-{Stealth}] (start) -- (krok);
+</code></pre>
+<hr />
+<h2 id="9-pgfplots-lab-7">9. PGFPlots (lab 7)</h2>
+<p>W <code>main.tex</code> po stylu:</p>
+<pre><code class="language-latex">\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+</code></pre>
+<p>Wyrażenia w <code>\addplot</code> pisz z gwiazdką mnożenia: <code>x^2 - 2*x - 3</code>. Zakres: <code>domain=-2:4</code>. Gęstość krzywej: <code>samples=100</code>. Grubości: <code>thin</code>, <code>thick</code>, <code>very thick</code>. Siatka: <code>grid=major</code> albo <code>grid=both</code>.</p>
+<h3 id="funkcja">Funkcja</h3>
+<p>Z zajęć: (f(x) = x^2 - 2x - 3) dla (x \in [-2, 4]). Minimum w (x = 1), (f(1) = -4).</p>
+<pre><code class="language-latex">\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}
+    \begin{axis}[
+        width=0.82\textwidth,
+        height=7cm,
+        xlabel={$x$},
+        ylabel={$f(x)$},
+        grid=both,
+        scaled ticks=false,
+        ymin=-5, ymax=6,
+      ]
+      \addplot[domain=-2:4, samples=101, very thick] {x^2 - 2*x - 3};
+      \addplot[only marks, mark=*, mark size=2.5pt, red] coordinates {(1,-4)};
+    \end{axis}
+  \end{tikzpicture}
+  \caption{Wykres funkcji $f(x) = x^2 - 2x - 3$}
+  \label{fig:funkcja}
+\end{figure}
+</code></pre>
+<p><code>scaled ticks=false</code> wyłącza mnożnik typu (\cdot 10^{3}) przy osi.</p>
+<h3 id="dwie-serie-z-csv">Dwie serie z CSV</h3>
+<p>Plik (kropka dziesiętna, przecinek jako separator kolumn), np. <code>dane_porownawcze.csv</code> obok <code>main.tex</code>:</p>
+<pre><code class="language-text">n,bubble_ms,insertion_ms,bubble_porownania,insertion_porownania
+100,0.4,0.2,4950,2600
+500,8.9,4.1,124750,65000
+1000,35.2,16.3,499500,260000
+2000,141.5,65.1,1999000,1040000
+5000,883.7,406.4,12497500,6500000
+</code></pre>
+<p>Wykres czyta plik. Liczb do <code>\addplot</code> nie przepisuj.</p>
+<pre><code class="language-latex">\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}
+    \begin{axis}[
+        width=0.88\textwidth,
+        height=7.5cm,
+        xlabel={Liczba elementów $n$},
+        ylabel={Czas wykonania [ms]},
+        grid=major,
+        legend pos=north west,
+        scaled ticks=false,
+        xmin=0, xmax=5400,
+        ymin=0,
+      ]
+      \addplot[very thick, mark=*, mark size=1.8pt]
+        table[col sep=comma, header=true, x=n, y=bubble_ms]
+        {dane_porownawcze.csv};
+      \addplot[thick, dashed, mark=square*, mark size=2pt]
+        table[col sep=comma, header=true, x=n, y=insertion_ms]
+        {dane_porownawcze.csv};
+      \legend{Bubble Sort, Insertion Sort}
+    \end{axis}
+  \end{tikzpicture}
+  \caption{Przykładowe czasy wykonania algorytmów sortowania}
+  \label{fig:czasy-sortowania}
+\end{figure}
+</code></pre>
+<p>Odwołanie i jednostki w tekście:</p>
+<pre><code class="language-latex">\Cref{fig:czasy-sortowania} pokazuje czasy syntetyczne, nie pomiary.
+Dla \(n = 5000\) Bubble Sort zajmuje \qty{883.7}{\milli\second}.
+</code></pre>
+<p>Zmiana liczby w CSV + kompilacja przesuwa punkt. Po teście przywróć oryginał.</p>
+<h3 id="warianty-o-ktore-moga-zapytac">Warianty, o które mogą zapytać</h3>
+<p>Skala logarytmiczna (wszystkie (y &gt; 0); zero na osi Y wtedy odpada):</p>
+<pre><code class="language-latex">\begin{axis}[ymode=log, xlabel={Liczba elementów $n$}, ylabel={Czas [ms]}, legend pos=north west]
+  \addplot[very thick, mark=*]
+    table[col sep=comma, x=n, y=bubble_ms] {dane_porownawcze.csv};
+  \legend{Bubble Sort}
+\end{axis}
+</code></pre>
+<p>Same punkty, bez linii:</p>
+<pre><code class="language-latex">\addplot[only marks, mark=*, mark size=2.5pt]
+  table[col sep=comma, x=n, y=bubble_ms] {dane_porownawcze.csv};
+</code></pre>
+<p>Liczba porównań (te same kolumny CSV):</p>
+<pre><code class="language-latex">\addplot[very thick, mark=*]
+  table[col sep=comma, x=n, y=bubble_porownania] {dane_porownawcze.csv};
+\addplot[thick, dashed, mark=square*]
+  table[col sep=comma, x=n, y=insertion_porownania] {dane_porownawcze.csv};
+\legend{Bubble Sort, Insertion Sort}
+</code></pre>
+<p>Oś Y wtedy podpisz <code>Liczba porównań</code> i podnieś <code>ymax</code> (wartości idą w miliony) albo włącz <code>scaled ticks</code>.</p>
+<p>Inna legenda, gdy nie chcesz <code>\legend</code>:</p>
+<pre><code class="language-latex">\begin{axis}[legend entries={Bubble Sort, Insertion Sort}, legend pos=north east]
+</code></pre>
+<p>Pozycje legendy: <code>north west</code>, <code>north east</code>, <code>south east</code>, <code>outer north east</code>.</p>
+<p>Znaczniki: <code>mark=*</code>, <code>mark=square*</code>, <code>mark=triangle*</code>, <code>mark=o</code>, <code>mark=diamond*</code>. Linie: <code>solid</code>, <code>dashed</code>, <code>dotted</code>. Kolory: <code>blue</code>, <code>red</code>, <code>orange</code>, <code>projectblue</code>, <code>blue!70</code>.</p>
+<p>Wykres w osobnym pliku <code>wykres-czasy.tex</code> (sam <code>tikzpicture</code>, bez <code>\documentclass</code>) i w rozdziale:</p>
+<pre><code class="language-latex">\input{wykres-czasy.tex}
+</code></pre>
+<p><code>\input</code> wstawia w miejscu wywołania. <code>\include</code> zaczyna nową stronę i nie bierze rozszerzenia.</p>
+<hr />
+<h2 id="10-kolejnosc-ktora-nie-wywala-kompilacji">10. Kolejność, która nie wywala kompilacji</h2>
+<p>Tabela:</p>
+<pre><code class="language-text">\begin{table} → \centering → \caption → \label → \begin{tabular} → dane → \end{tabular} → \end{table}
+</code></pre>
+<p>Rysunek / TikZ / wykres:</p>
+<pre><code class="language-text">\begin{figure} → \centering → obrazek albo tikzpicture → \caption → \label → \end{figure}
+</code></pre>
+<p>Listing: <code>caption</code> i <code>label</code> w nawiasie kwadratowym opcji, plik na końcu w <code>{ }</code>.</p>
+<p>Cytowanie: najpierw rekord w <code>.bib</code>, potem <code>\cite{klucz}</code>, potem Biber.</p>
+<hr />
+<h2 id="11-puapki-z-laboratoriow">11. Pułapki z laboratoriów</h2>
+<table>
+<thead>
+<tr>
+<th>Objaw</th>
+<th>Co zrobić</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>„Ten szablon wymaga LuaLaTeX”, <code>OT1</code>, <code>Invalid UTF-8</code> w <code>main.vrb</code></td>
+<td>kompilator to pdfLaTeX; przestaw na LuaLaTeX i skompiluj od zera</td>
+</tr>
+<tr>
+<td>w tekście <code>[gcc2026]</code> zamiast <code>[1]</code></td>
+<td>uruchom Biber, potem dwa razy LuaLaTeX</td>
+</tr>
+<tr>
+<td>brak rozdziału Literatura</td>
+<td>to samo + sprawdź, czy <code>\cite</code> w ogóle jest w tekście</td>
+</tr>
+<tr>
+<td><code>??</code></td>
+<td><code>\label</code> po <code>\caption</code>, zgodny klucz, druga kompilacja</td>
+</tr>
+<tr>
+<td><code>File ... not found</code></td>
+<td>ścieżka od <code>main.tex</code>; sprawdź katalog i rozszerzenie</td>
+</tr>
+<tr>
+<td><code>Undefined control sequence</code> przy <code>\addplot</code></td>
+<td>brak <code>\usepackage{pgfplots}</code></td>
+</tr>
+<tr>
+<td><code>Undefined control sequence</code> przy <code>\multirow</code></td>
+<td>brak <code>\usepackage{multirow}</code></td>
+</tr>
+<tr>
+<td>wykres CSV pusty / błąd tabeli</td>
+<td><code>col sep=comma</code>, nazwy kolumn jak w pierwszym wierszu, kropka w liczbach</td>
+</tr>
+<tr>
+<td>skala log wywala się</td>
+<td>w danych jest 0 albo liczba ujemna</td>
+</tr>
+<tr>
+<td>polskie znaki w listingu rozsypane</td>
+<td>zostań przy LuaLaTeX; nie dodawaj <code>literate</code></td>
+</tr>
+<tr>
+<td><code>final</code> przerywa kompilację</td>
+<td>wróć na <code>draft</code> albo uzupełnij metadane</td>
+</tr>
+<tr>
+<td><code>\projectpdfauthors</code> z <code>&amp;</code> albo <code>\\</code></td>
+<td>tam jest zwykły tekst, przecinki</td>
+</tr>
+<tr>
+<td>dwa razy ten sam <code>\label</code></td>
+<td>zmień jeden klucz</td>
+</tr>
+<tr>
+<td>rysunek sam na stronie z wielką dziurą</td>
+<td>zmniejsz <code>width</code>, zmień <code>[htbp]</code> na <code>[ht]</code></td>
+</tr>
+<tr>
+<td>numer tabeli wpisany słownie</td>
+<td>zamień na <code>\cref{tab:...}</code></td>
+</tr>
+<tr>
+<td>literatura jako lista w rozdziale</td>
+<td>przenieś do <code>.bib</code> i <code>\cite</code></td>
+</tr>
+<tr>
+<td>schemat jako PNG</td>
+<td>przerób na <code>tikzpicture</code></td>
+</tr>
+<tr>
+<td>wykres jako PNG</td>
+<td>przerób na <code>axis</code> + <code>\addplot</code></td>
+</tr>
+</tbody>
+</table>
+<p>Komunikat czytaj od pierwszej linii z <code>!</code> albo <code>error</code>. Poprawiasz plik, który edytor wskazuje, i kompilujesz znowu.</p>
+<hr />
+<h2 id="12-dokument-od-zera-gdyby-nie-dali-szablonu">12. Dokument od zera (gdyby nie dali szablonu)</h2>
+<p>Na zajęciach zawsze był szablon. Gdyby kazali pusty plik, minimalna preambuła pod te 6 laborek:</p>
+<pre><code class="language-latex">\documentclass[11pt,a4paper]{article}
+\usepackage[polish]{babel}
+\usepackage{amsmath,booktabs,tabularx,siunitx,graphicx,listings}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta,shapes.geometric}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage[backend=biber,style=numeric,sorting=nyt]{biblatex}
+\addbibresource{literatura.bib}
+\usepackage{hyperref}
+\usepackage{cleveref}
+\begin{document}
+
+% tu rozdziały: \section, table, figure, lstlisting, tikzpicture, axis
+
+\printbibliography[heading=bibintoc,title={Literatura}]
+\end{document}
+</code></pre>
+<p>W <code>article</code> jest <code>\section</code>, nie <code>\chapter</code>. W szablonie projektu klasa to <code>report</code>, więc rozdziały to <code>\chapter</code>.</p>
+<p>Kompilacja: <code>lualatex</code>, <code>biber</code>, <code>lualatex</code>, <code>lualatex</code>.</p>
+<hr />
+<h2 id="13-checklista-przed-oddaniem">13. Checklista przed oddaniem</h2>
+<ul>
+<li>Kompilator: LuaLaTeX. PDF otwiera się, polskie znaki są całe.</li>
+<li>Strona tytułowa z <code>metadata.tex</code>, status <code>draft</code> (albo <code>final</code> tylko gdy prowadzący każe i dane są pełne).</li>
+<li>Sekcje zrobione poleceniami, nie pogrubieniem.</li>
+<li>Jest <code>\textbf</code> i <code>\textit</code> (albo <code>\emph</code>).</li>
+<li>Jest <code>itemize</code> i <code>enumerate</code>.</li>
+<li>Indeks, potęga, ułamek, suma, pochodna. Przynajmniej jedno <code>equation</code> z numerem.</li>
+<li>Tabela: 5 kolumn, <code>\caption</code>, <code>\label</code>, w tekście <code>\cref</code>.</li>
+<li>Rysunek z pliku: szerokość względem <code>\textwidth</code>, podpis, etykieta, <code>\cref</code>.</li>
+<li>Listing w <code>lstlisting</code> oraz drugi przez <code>\lstinputlisting</code>.</li>
+<li>Przy C: <code>language=C</code>, <code>numbers=left</code>, podpis, etykieta, <code>\cref</code>.</li>
+<li>TikZ: elipsa, prostokąt, romb, strzałki, gałęzie Tak/Nie, <code>figure</code> + <code>\caption</code> + <code>\label</code>.</li>
+<li>PGFPlots: funkcja z <code>domain</code>, <code>xlabel</code>, <code>ylabel</code>, <code>grid</code>, <code>very thick</code>.</li>
+<li>Drugi wykres z CSV (<code>col sep=comma</code>, <code>x=</code>, <code>y=</code>), dwie serie, <code>\legend</code>, jednostki na osi.</li>
+<li><code>literatura.bib</code>: prawdziwe źródła, <code>url</code> + <code>urldate</code>, autorzy przez <code>and</code>.</li>
+<li>W tekście co najmniej dwa <code>\cite</code>. Po Biberze numery, nie klucze.</li>
+<li>Spisy rysunków i tabel włączone (<code>true</code>) i po kompilacji mają aktualne strony.</li>
+<li>Żadnego <code>??</code>, żadnej literatury wpisanej ręcznie jako lista, żadnego „Rys. 1” na sztywno.</li>
+</ul>
+</body>
+</html>

@@ -1,0 +1,139 @@
+% TREŚĆ ROZDZIAŁU: zastąp wskazówki opisem testów i uzyskanych wyników.
+% Każdą tabelę i każdy rysunek omów w tekście. Podawaj jednostki, warunki
+% pomiaru oraz odwołanie do wymagania, które dany test weryfikuje.
+\chapter{Weryfikacja i wyniki}
+\label{chap:wyniki}
+
+\section{Metodyka testów}
+Opisz stanowisko, dane, warunki, procedurę i miary. Informacje powinny wystarczyć do powtórzenia najważniejszych testów.
+
+\section{Wyniki}
+Dane porównawcze obu algorytmów zawiera \cref{tab:porownanie-algorytmow}.
+Zależność czasu sortowania bąbelkowego od liczby elementów pokazuje \cref{fig:wykres-sortowania}.
+Kod funkcji wyszukującej maksimum zamieszczono w \cref{lst:max-element}.
+\subsection{Porównanie algorytmów}
+Zestawienie czasu i liczby porównań dla dwóch algorytmów zawiera
+\cref{tab:porownanie-algorytmow}. Są to dane dydaktyczne, a nie wyniki pomiarów.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Porównanie przykładowych wyników dwóch algorytmów sortowania}
+  \label{tab:porownanie-algorytmow}
+  \begin{tabularx}{\textwidth}{@{}c *{4}{>{\centering\arraybackslash}X}@{}}
+    \toprule
+    Liczba elementów $n$
+      & Bubble Sort czas [ms]
+      & Insertion Sort czas [ms]
+      & Bubble Sort porównania
+      & Insertion Sort porównania \\
+    \midrule
+    100  & \num{0.4}   & \num{0.2}   & \num{4950}     & \num{2600}    \\
+    500  & \num{8.9}   & \num{4.1}   & \num{124750}   & \num{65000}   \\
+    1000 & \num{35.2}  & \num{16.3}  & \num{499500}   & \num{260000}  \\
+    2000 & \num{141.5} & \num{65.1}  & \num{1999000}  & \num{1040000} \\
+    5000 & \num{883.7} & \num{406.4} & \num{12497500} & \num{6500000} \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+Zależność czasu sortowania bąbelkowego od liczby elementów pokazuje
+\cref{fig:wykres-sortowania}. Wykres dotyczy wyłącznie Bubble Sort.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.8\textwidth]{%
+    chapters/05-weryfikacja-i-wyniki/figures/wykres_sortowania.png}
+  \caption{Przykładowa zależność czasu sortowania od liczby elementów}
+  \label{fig:wykres-sortowania}
+\end{figure}
+
+\section{Ocena spełnienia wymagań}
+Dla każdego wymagania podaj wynik testu oraz status: spełnione, częściowo spełnione albo niespełnione. Odnieś się do kryteriów z \cref{chap:cel-wymagania}.
+
+\section{Dyskusja}
+Zinterpretuj rezultaty, wyjaśnij odstępstwa i wskaż ograniczenia wiarygodności oceny.
+
+\section{Wykresy tworzone w LaTeX}
+\label{sec:wykresy-latex}
+
+\subsection{Wykres funkcji matematycznej}
+
+Na przedziale \([-2, 4]\) funkcja \(f(x) = x^{2} - 2x - 3\) jest parabolą
+skierowaną ramionami do góry. Pochodna \(f'(x) = 2x - 2\) zeruje się
+dla \(x = 1\), więc minimum wynosi \(f(1) = -4\). Ten punkt jest
+zaznaczony na wykresie.
+
+\begin{center}
+  \begin{tikzpicture}
+    \begin{axis}[
+        width=0.82\textwidth,
+        height=7.2cm,
+        xlabel={$x$},
+        ylabel={$f(x)$},
+        grid=both,
+        minor tick num=1,
+        tick label style={font=\small},
+        label style={font=\small},
+        scaled ticks=false,
+        ymin=-5, ymax=6,
+        enlarge y limits=false,
+        clip=false,
+      ]
+      \addplot[domain=-2:4, samples=101, very thick, projectblue]
+        {x^2 - 2*x - 3};
+      \addplot[only marks, mark=*, mark size=2.2pt, red!70!black]
+        coordinates {(1,-4)};
+      \node[anchor=west, font=\small, inner sep=1pt]
+        at (axis cs:1.15,-4.55) {$(1,-4)$};
+    \end{axis}
+  \end{tikzpicture}
+\end{center}
+
+\subsection{Porównanie czasów wykonania}
+
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}
+    \begin{axis}[
+        width=0.88\textwidth,
+        height=7.6cm,
+        xlabel={Liczba elementów $n$},
+        ylabel={Czas wykonania [ms]},
+        grid=major,
+        legend pos=north west,
+        legend cell align={left},
+        tick label style={font=\small},
+        label style={font=\small},
+        legend style={font=\small},
+        scaled ticks=false,
+        xmin=0, xmax=5400,
+        ymin=0, ymax=1000,
+      ]
+      \addplot[
+          very thick,
+          projectblue,
+          mark=*,
+          mark size=1.8pt,
+        ] table[col sep=comma, header=true, x=n, y=bubble_ms]
+          {dane_porownawcze.csv};
+      \addplot[
+          thick,
+          dashed,
+          orange!75!black,
+          mark=square*,
+          mark size=2.1pt,
+        ] table[col sep=comma, header=true, x=n, y=insertion_ms]
+          {dane_porownawcze.csv};
+      \legend{Bubble Sort, Insertion Sort}
+    \end{axis}
+  \end{tikzpicture}
+  \caption{Przykładowe czasy wykonania algorytmów sortowania}
+  \label{fig:czasy-sortowania}
+\end{figure}
+
+\Cref{fig:czasy-sortowania} pokazuje, że obie serie rosną szybciej niż liniowo,
+a czas Bubble Sort jest w każdym punkcie około dwukrotnie większy niż
+czas Insertion Sort. Wraz ze wzrostem liczby elementów różnica się
+powiększa: dla \(n = 5000\) czasy wynoszą odpowiednio
+\qty{883.7}{\milli\second} oraz \qty{406.4}{\milli\second}.
+Podane wartości są syntetyczne i nie stanowią wyników pomiarów.

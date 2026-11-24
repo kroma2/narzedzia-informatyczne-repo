@@ -1,0 +1,79 @@
+\chapter{Wprowadzenie}
+\label{chap:wprowadzenie}
+\begin{tikzpicture}[
+    node distance=9mm,
+    startstop/.style={ellipse, draw, align=center, minimum width=2.6cm},
+    process/.style={rectangle, draw, align=center, minimum width=3.4cm},
+    decision/.style={diamond, draw, align=center, aspect=2.4, inner sep=1pt},
+    every path/.style={-{Stealth}}
+]
+    \node[startstop] (start) {Start};
+    \node[process, below=of start] (pobierz) {Pobierz tablicę};
+    \node[process, below=of pobierz] (przebieg) {Wykonaj pełny przebieg\\porównań i zmian};
+    \node[decision, below=14mm of przebieg] (warunek) {Czy wykonano\\zamianę?};
+    \node[startstop, below=14mm of warunek] (koniec) {Koniec};
+    \draw (start) -- (pobierz);
+    \draw (pobierz) -- (przebieg);
+    \draw (przebieg) -- (warunek);
+    \draw (warunek) -- node[right] {Nie} (koniec);
+    \draw (warunek.east) -- ++(1.5,0) |- (przebieg.east)
+        node[pos=0.5, right, yshift=-15mm] {Tak};
+\end{tikzpicture}
+
+\section{Wprowadzenie}
+
+Sortowanie polega na uporządkowaniu elementów zbioru według przyjętego
+\textbf{kryterium}, np. \textit{rosnąco} lub malejąco.
+Algorytmy sortowania wykorzystuje się podczas przetwarzania i wyszukiwania danych.
+Jedną z prostych metod jest \textbf{sortowanie bąbelkowe}.
+
+\section{Sortowanie bąbelkowe}
+
+    \subsection{Zasada działania}
+
+    Sortowanie bąbelkowe polega na porównywaniu par sąsiednich elementów tablicy.
+    Jeśli element o indeksie \(i\) jest większy niż kolejny element, ich miejsca
+    są zamieniane. Warunek zamiany przedstawia zależność \(a_i > a_{i+1}\).
+
+    Kolejne przebiegi algorytmu powodują stopniowe przemieszczanie największych
+    elementów na koniec tablicy.
+
+    \subsection{Etapy algorytmu}
+
+    \begin{enumerate}
+        \item Porównaj dwa sąsiednie elementy tablicy.
+        \item Zamień je miejscami, jeśli ich kolejność jest niewłaściwa.
+        \item Przejdź do kolejnej pary elementów.
+        \item Powtarzaj przebiegi aż do uporządkowania danych.
+    \end{enumerate}
+    Dwie cechy algorytmu:
+    \begin{itemize}
+        \item prostota implementacji,
+        \item niska efektywność dla dużych zbiorów danych.
+    \end{itemize}
+
+\section{Złożoność obliczeniowa}
+
+Dla typowej wersji sortowania bąbelkowego liczba porównań wykonywanych
+w najgorszym przypadku wynosi:
+\begin{equation}
+    C(n) = \frac{n(n-1)}{2}
+\end{equation}
+Złożoność czasowa w najgorszym przypadku to \(O(n^2)\).
+a dodatkowa złożoność pamięciowa wynosi \(O(1)\).
+\section{Podstawowe zapisy matematyczne}
+Suma elementów tablicy wynosi:
+\[
+    S = \sum_{i=1}^{n} a_i
+\]
+
+Funkcja i jej pochodna:
+\[
+    f(x) = x^3 + 2x^2 -5x, \qquad f'(x) = 3x^2 + 4x - 5
+\]
+\section{Wnioski}
+
+Sortowanie bąbelkowe jest proste w implementacji i pomaga zrozumieć działanie
+algorytmów porównawczych. Ze względu na kwadratową złożoność czasową nie jest
+jednak odpowiednim wyborem do sortowania bardzo dużych zbiorów danych.
+W arkuszu \textbf{Excel} sortowanie układa wiersze według wartości wybranej kolumny.
